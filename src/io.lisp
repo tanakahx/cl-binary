@@ -66,6 +66,16 @@
           (ash (read-byte stream) 16)
           (ash (read-byte stream) 24)))
 
+(defun read-u64 (stream)
+  (logior (ash (read-byte stream) 0)
+          (ash (read-byte stream) 8)
+          (ash (read-byte stream) 16)
+          (ash (read-byte stream) 24)
+          (ash (read-byte stream) 32)
+          (ash (read-byte stream) 40)
+          (ash (read-byte stream) 48)
+          (ash (read-byte stream) 56)))
+
 (defun write-u8 (data stream)
   (write-byte data stream))
 
@@ -78,6 +88,16 @@
   (write-byte (logand #xff (ash data  -8)) stream)
   (write-byte (logand #xff (ash data -16)) stream)
   (write-byte (logand #xff (ash data -24)) stream))
+
+(defun write-u64 (data stream)
+  (write-byte (logand #xff (ash data   0)) stream)
+  (write-byte (logand #xff (ash data  -8)) stream)
+  (write-byte (logand #xff (ash data -16)) stream)
+  (write-byte (logand #xff (ash data -24)) stream)
+  (write-byte (logand #xff (ash data -32)) stream)
+  (write-byte (logand #xff (ash data -40)) stream)
+  (write-byte (logand #xff (ash data -48)) stream)
+  (write-byte (logand #xff (ash data -56)) stream))
 
 (defun u-to-s (number bit)
   "Convert an unsigned number to a signed number with `bit` length."
@@ -106,6 +126,9 @@
 (defun read-s32 (stream)
   (u-to-s (read-u32 stream) 32))
 
+(defun read-s64 (stream)
+  (u-to-s (read-u64 stream) 64))
+
 (defun write-s8 (data stream)
   (write-u8 (s-to-u data 8) stream))
 
@@ -114,3 +137,6 @@
 
 (defun write-s32 (data stream)
   (write-u32 (s-to-u data 32) stream))
+
+(defun write-s64 (data stream)
+  (write-u64 (s-to-u data 64) stream))

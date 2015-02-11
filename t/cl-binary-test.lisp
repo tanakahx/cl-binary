@@ -9,16 +9,18 @@
 (in-suite cl-binary-test)
 
 (test read-u*
-  (with-binary-input-stream (in #(#x12 #x34 #x56 #x78))
-    (is (and (= (read-u8 in) #x12)
-             (= (read-u8 in) #x34)
-             (= (read-u8 in) #x56)
-             (= (read-u8 in) #x78))))
-  (with-binary-input-stream (in #(#x12 #x34 #x56 #x78))
-    (is (and (= (read-u16 in) #x3412)
-             (= (read-u16 in) #x7856))))
-  (with-binary-input-stream (in #(#x12 #x34 #x56 #x78))
-    (is (= (read-u32 in) #x78563412))))
+  (with-binary-input-stream (in #(#x01 #x23 #x45 #x67))
+    (is (and (= (read-u8 in) #x01)
+             (= (read-u8 in) #x23)
+             (= (read-u8 in) #x45)
+             (= (read-u8 in) #x67))))
+  (with-binary-input-stream (in #(#x01 #x23 #x45 #x67))
+    (is (and (= (read-u16 in) #x2301)
+             (= (read-u16 in) #x6745))))
+  (with-binary-input-stream (in #(#x01 #x23 #x45 #x67))
+    (is (= (read-u32 in) #x67452301)))
+  (with-binary-input-stream (in #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef))
+    (is (= (read-u64 in) #xefcdab8967452301))))
 
 (test write-u*
   (is (equalp (with-binary-output-stream (out)
@@ -35,36 +37,51 @@
                 (write-u32 #x67452301 out)
                 (write-u32 #xefcdab89 out))
               #(#x01 #x23 #x45 #x67
+                #x89 #xab #xcd #xef)))
+  (is (equalp (with-binary-output-stream (out)
+                (write-u64 #xefcdab8967452301 out))
+              #(#x01 #x23 #x45 #x67
                 #x89 #xab #xcd #xef))))
 
 (test read-s*
   (with-binary-input-stream (in #(#x80 #xff #xff #xff))
-    (is (= (read-s8 in) -128)))
+    (is (= (read-s8 in) (- (expt 2 7)))))
   (with-binary-input-stream (in #(#x00 #x80 #xff #xff))
-    (is (= (read-s16 in) -32768)))
+    (is (= (read-s16 in) (- (expt 2 15)))))
   (with-binary-input-stream (in #(#x00 #x00 #x00 #x80))
-    (is (= (read-s32 in) -2147483648))))
+    (is (= (read-s32 in) (- (expt 2 31)))))
+  (with-binary-input-stream (in #(#x00 #x00 #x00 #x00 #x00 #x00 #x00 #x80))
+    (is (= (read-s64 in) (- (expt 2 63))))))
 
 (test write-s*
   (is (equalp (with-binary-output-stream (out)
-                (write-s8 -128 out)
-                (write-s8 -127 out)
-                (write-s8 -126 out)
-                (write-s8 -125 out))
+                (write-s8 (+ (- (expt 2 7)) 0) out)
+                (write-s8 (+ (- (expt 2 7)) 1) out)
+                (write-s8 (+ (- (expt 2 7)) 2) out)
+                (write-s8 (+ (- (expt 2 7)) 3) out))
               #(#x80 #x81 #x82 #x83)))
   (is (equalp (with-binary-output-stream (out)
-                (write-s16 -32768 out)
-                (write-s16 -32767 out)
-                (write-s16 -32766 out)
-                (write-s16 -32765 out))
+                (write-s16 (+ (- (expt 2 15)) 0) out)
+                (write-s16 (+ (- (expt 2 15)) 1) out)
+                (write-s16 (+ (- (expt 2 15)) 2) out)
+                (write-s16 (+ (- (expt 2 15)) 3) out))
               #(#x00 #x80 #x01 #x80
                 #x02 #x80 #x03 #x80)))
   (is (equalp (with-binary-output-stream (out)
-                (write-s32 -2147483648 out)
-                (write-s32 -2147483647 out)
-                (write-s32 -2147483646 out)
-                (write-s32 -2147483645 out))
+                (write-s32 (+ (- (expt 2 31)) 0) out)
+                (write-s32 (+ (- (expt 2 31)) 1) out)
+                (write-s32 (+ (- (expt 2 31)) 2) out)
+                (write-s32 (+ (- (expt 2 31)) 3) out))
               #(#x00 #x00 #x00 #x80
                 #x01 #x00 #x00 #x80
                 #x02 #x00 #x00 #x80
-                #x03 #x00 #x00 #x80))))
+                #x03 #x00 #x00 #x80)))
+  (is (equalp (with-binary-output-stream (out)
+                (write-s64 (+ (- (expt 2 63)) 0) out)
+                (write-s64 (+ (- (expt 2 63)) 1) out)
+                (write-s64 (+ (- (expt 2 63)) 2) out)
+                (write-s64 (+ (- (expt 2 63)) 3) out))
+              #(#x00 #x00 #x00 #x00 #x00 #x00 #x00 #x80
+                #x01 #x00 #x00 #x00 #x00 #x00 #x00 #x80
+                #x02 #x00 #x00 #x00 #x00 #x00 #x00 #x80
+                #x03 #x00 #x00 #x00 #x00 #x00 #x00 #x80))))
