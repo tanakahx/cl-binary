@@ -25,7 +25,16 @@
                 :write-s8
                 :write-s16
                 :write-s32
-                :write-s64)
+                :write-s64
+                :read-u8vector
+                :read-u16vector
+                :read-u32vector
+                :read-u64vector
+                :write-u8vector
+                :write-u16vector
+                :write-u32vector
+                :write-u64vector
+                :uvector-to-string)
   (:export :make-binary-input-stream
            :make-binary-output-stream
            :with-binary-input-stream
@@ -47,5 +56,14 @@
            :write-s8
            :write-s16
            :write-s32
-           :write-s64))
+           :write-s64
+           :read-u8vector
+           :read-u16vector
+           :read-u32vector
+           :read-u64vector
+           :write-u8vector
+           :write-u16vector
+           :write-u32vector
+           :write-u64vector
+           :uvector-to-string))
 (in-package :cl-binary)

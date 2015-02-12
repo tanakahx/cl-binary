@@ -140,3 +140,43 @@
 
 (defun write-s64 (data stream)
   (write-u64 (s-to-u data 64) stream))
+
+;;; Define the following functions
+;;; read-u8vector
+;;; read-u16vector
+;;; read-u32vector
+;;; read-u64vector
+(defmacro def-read-uvector (unit)
+  `(defun ,(intern (format nil "READ-U~aVECTOR" unit)) (size stream)
+     (loop
+        with uv = (make-array size :element-type '(unsigned-byte ,unit))
+        for i below size
+        do (setf (aref uv i) (,(intern (format nil "READ-U~a" unit)) stream))
+        finally (return uv))))
+
+(def-read-uvector 8)
+(def-read-uvector 16)
+(def-read-uvector 32)
+(def-read-uvector 64)
+
+;;; Define the following functions
+;;; write-u8vector
+;;; write-u16vector
+;;; write-u32vector
+;;; write-u64vector
+(defmacro def-write-uvector (unit)
+  `(defun ,(intern (format nil "WRITE-U~aVECTOR" unit)) (vec stream)
+     (loop for x across vec
+        do (,(intern (format nil "WRITE-U~a" unit)) x stream))))
+
+(def-write-uvector 8)
+(def-write-uvector 16)
+(def-write-uvector 32)
+(def-write-uvector 64)
+
+(defun uvector-to-string (uv)
+  (loop
+     with s = (make-array (length uv) :element-type 'character)
+     for i from 0 below (length uv)
+     do (setf (schar s i) (code-char (aref uv i)))
+     finally (return s)))

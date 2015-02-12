@@ -85,3 +85,35 @@
                 #x01 #x00 #x00 #x00 #x00 #x00 #x00 #x80
                 #x02 #x00 #x00 #x00 #x00 #x00 #x00 #x80
                 #x03 #x00 #x00 #x00 #x00 #x00 #x00 #x80))))
+
+(test read-uvector
+  (with-binary-input-stream (in #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef))
+    (is (equalp (read-u8vector 8 in)
+                #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef))))
+  (with-binary-input-stream (in #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef))
+    (is (equalp (read-u16vector 4 in)
+                #(#x2301 #x6745 #xab89 #xefcd))))
+  (with-binary-input-stream (in #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef))
+    (is (equalp (read-u32vector 2 in)
+                #(#x67452301 #xefcdab89))))
+  (with-binary-input-stream (in #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef))
+    (is (equalp (read-u64vector 1 in)
+                #(#xefcdab8967452301)))))
+
+(test write-uvector
+  (is (equalp (with-binary-output-stream (out)
+                (write-u8vector #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef) out))
+              #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef)))
+  (is (equalp (with-binary-output-stream (out)
+                (write-u16vector #(#x2301 #x6745 #xab89 #xefcd) out))
+              #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef)))
+  (is (equalp (with-binary-output-stream (out)
+                (write-u32vector #(#x67452301 #xefcdab89) out))
+              #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef)))
+  (is (equalp (with-binary-output-stream (out)
+                (write-u64vector #(#xefcdab8967452301) out))
+              #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef))))
+
+(test uvector-to-string
+  (is (string= (uvector-to-string #(65 66 67 68))
+               "ABCD")))
