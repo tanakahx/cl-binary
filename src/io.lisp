@@ -53,51 +53,39 @@
   `(with-open-file (,stream ,filespec :direction :output :element-type '(unsigned-byte 8) :if-exists :supersede)
      ,@body))
 
-(defun read-u8 (stream)
-  (read-byte stream))
+;;; read-u8
+;;; read-u16
+;;; read-u32
+;;; read-u64
+(defmacro def-read-u* (unit)
+  `(defun ,(intern (format nil "READ-U~a" unit)) (stream)
+     ,(if (<= unit 8)
+          `(read-byte stream)
+          `(logior
+            ,@(loop for i from 0 below unit by 8
+                 collect `(ash (read-byte stream) ,i))))))
 
-(defun read-u16 (stream)
-  (logior (ash (read-byte stream) 0)
-          (ash (read-byte stream) 8)))
+(def-read-u* 8)
+(def-read-u* 16)
+(def-read-u* 32)
+(def-read-u* 64)
 
-(defun read-u32 (stream)
-  (logior (ash (read-byte stream) 0)
-          (ash (read-byte stream) 8)
-          (ash (read-byte stream) 16)
-          (ash (read-byte stream) 24)))
+;;; write-u8
+;;; write-u16
+;;; write-u32
+;;; write-u64
+(defmacro def-write-u* (unit)
+  `(defun ,(intern (format nil "WRITE-U~a" unit)) (data stream)
+     ,(if (<= unit 8)
+          `(write-byte data stream)
+          (cons 'progn
+                (loop for i from 0 above (- unit) by 8
+                   collect `(write-byte (logand #xff (ash data ,i)) stream))))))
 
-(defun read-u64 (stream)
-  (logior (ash (read-byte stream) 0)
-          (ash (read-byte stream) 8)
-          (ash (read-byte stream) 16)
-          (ash (read-byte stream) 24)
-          (ash (read-byte stream) 32)
-          (ash (read-byte stream) 40)
-          (ash (read-byte stream) 48)
-          (ash (read-byte stream) 56)))
-
-(defun write-u8 (data stream)
-  (write-byte data stream))
-
-(defun write-u16 (data stream)
-  (write-byte (logand #xff (ash data  0)) stream)
-  (write-byte (logand #xff (ash data -8)) stream))
-
-(defun write-u32 (data stream)
-  (write-byte (logand #xff (ash data   0)) stream)
-  (write-byte (logand #xff (ash data  -8)) stream)
-  (write-byte (logand #xff (ash data -16)) stream)
-  (write-byte (logand #xff (ash data -24)) stream))
-
-(defun write-u64 (data stream)
-  (write-byte (logand #xff (ash data   0)) stream)
-  (write-byte (logand #xff (ash data  -8)) stream)
-  (write-byte (logand #xff (ash data -16)) stream)
-  (write-byte (logand #xff (ash data -24)) stream)
-  (write-byte (logand #xff (ash data -32)) stream)
-  (write-byte (logand #xff (ash data -40)) stream)
-  (write-byte (logand #xff (ash data -48)) stream)
-  (write-byte (logand #xff (ash data -56)) stream))
+(def-write-u* 8)
+(def-write-u* 16)
+(def-write-u* 32)
+(def-write-u* 64)
 
 (defun u-to-s (number bit)
   "Convert an unsigned number to a signed number with `bit` length."
@@ -141,7 +129,6 @@
 (defun write-s64 (data stream)
   (write-u64 (s-to-u data 64) stream))
 
-;;; Define the following functions
 ;;; read-u8vector
 ;;; read-u16vector
 ;;; read-u32vector
