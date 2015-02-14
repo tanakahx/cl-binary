@@ -129,15 +129,28 @@
 (defun write-s64 (data stream)
   (write-u64 (s-to-u data 64) stream))
 
+;;; make-u8vector
+;;; make-u16vector
+;;; make-u32vector
+;;; make-u64vector
+(defmacro make-uvector (unit)
+  `(defmacro ,(intern (format nil "MAKE-U~aVECTOR" unit)) (len &optional (fill 0))
+     `(make-array ,len :element-type '(unsigned-byte ,,unit) :initial-element ,fill)))
+
+(make-uvector 8)
+(make-uvector 16)
+(make-uvector 32)
+(make-uvector 64)
+
 ;;; read-u8vector
 ;;; read-u16vector
 ;;; read-u32vector
 ;;; read-u64vector
 (defmacro def-read-uvector (unit)
-  `(defun ,(intern (format nil "READ-U~aVECTOR" unit)) (size stream)
+  `(defun ,(intern (format nil "READ-U~aVECTOR" unit)) (len stream)
      (loop
-        with uv = (make-array size :element-type '(unsigned-byte ,unit))
-        for i below size
+        with uv = (make-array len :element-type '(unsigned-byte ,unit))
+        for i below len
         do (setf (aref uv i) (,(intern (format nil "READ-U~a" unit)) stream))
         finally (return uv))))
 

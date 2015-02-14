@@ -26,6 +26,10 @@
                 :write-s16
                 :write-s32
                 :write-s64
+                :make-u8vector
+                :make-u16vector
+                :make-u32vector
+                :make-u64vector
                 :read-u8vector
                 :read-u16vector
                 :read-u32vector
@@ -57,6 +61,10 @@
            :write-s16
            :write-s32
            :write-s64
+           :make-u8vector
+           :make-u16vector
+           :make-u32vector
+           :make-u64vector
            :read-u8vector
            :read-u16vector
            :read-u32vector
