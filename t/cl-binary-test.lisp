@@ -117,3 +117,13 @@
 (test uvector-to-string
   (is (string= (uvector-to-string #(65 66 67 68))
                "ABCD")))
+
+(test make-uvector
+  (is (equalp (make-u8vector 4)
+              #(0 0 0 0)))
+  (is (equalp (make-u8vector 4 #xff)
+              #(#xff #xff #xff #xff)))
+  (is (equalp (make-u64vector 1)
+              #(0)))
+  (is (equalp (make-u64vector 1 #x0123456789abcdef)
+              #(#x0123456789abcdef))))
