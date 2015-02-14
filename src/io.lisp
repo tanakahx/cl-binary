@@ -71,7 +71,7 @@
 ;;; write-u32
 ;;; write-u64
 (defmacro def-write-u* (unit)
-  `(defun ,(intern (format nil "WRITE-U~a" unit)) (data stream)
+  `(defun ,(intern (format nil "WRITE-U~a" unit)) (stream data)
      ,(if (<= unit 8)
           `(write-byte data stream)
           (cons 'progn
@@ -113,17 +113,17 @@
 (defun read-s64 (stream)
   (u-to-s (read-u64 stream) 64))
 
-(defun write-s8 (data stream)
-  (write-u8 (s-to-u data 8) stream))
+(defun write-s8 (stream data)
+  (write-u8 stream (s-to-u data 8)))
 
-(defun write-s16 (data stream)
-  (write-u16 (s-to-u data 16) stream))
+(defun write-s16 (stream data)
+  (write-u16 stream (s-to-u data 16)))
 
-(defun write-s32 (data stream)
-  (write-u32 (s-to-u data 32) stream))
+(defun write-s32 (stream data)
+  (write-u32 stream (s-to-u data 32)))
 
-(defun write-s64 (data stream)
-  (write-u64 (s-to-u data 64) stream))
+(defun write-s64 (stream data)
+  (write-u64 stream (s-to-u data 64)))
 
 ;;; make-u8vector
 ;;; make-u16vector
@@ -161,9 +161,9 @@
 ;;; write-u32vector
 ;;; write-u64vector
 (defmacro def-write-uvector (unit)
-  `(defun ,(intern (format nil "WRITE-U~aVECTOR" unit)) (vec stream)
+  `(defun ,(intern (format nil "WRITE-U~aVECTOR" unit)) (stream vec)
      (loop for x across vec
-        do (,(intern (format nil "WRITE-U~a" unit)) x stream))))
+        do (,(intern (format nil "WRITE-U~a" unit)) stream x))))
 
 (def-write-uvector 8)
 (def-write-uvector 16)
