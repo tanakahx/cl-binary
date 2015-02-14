@@ -13,14 +13,14 @@
                 :read-u16
                 :read-u32
                 :read-u64
-                :write-u8
-                :write-u16
-                :write-u32
-                :write-u64
                 :read-s8
                 :read-s16
                 :read-s32
                 :read-s64
+                :write-u8
+                :write-u16
+                :write-u32
+                :write-u64
                 :write-s8
                 :write-s16
                 :write-s32
@@ -29,15 +29,51 @@
                 :make-u16vector
                 :make-u32vector
                 :make-u64vector
+                :make-s8vector
+                :make-s16vector
+                :make-s32vector
+                :make-s64vector
+                :u8vector
+                :u16vector
+                :u32vector
+                :u64vector
+                :s8vector
+                :s16vector
+                :s32vector
+                :s64vector
                 :read-u8vector
                 :read-u16vector
                 :read-u32vector
                 :read-u64vector
+                :read-s8vector
+                :read-s16vector
+                :read-s32vector
+                :read-s64vector
                 :write-u8vector
                 :write-u16vector
                 :write-u32vector
                 :write-u64vector
-                :uvector-to-string)
+                :write-s8vector
+                :write-s16vector
+                :write-s32vector
+                :write-s64vector
+                :uvector-to-string
+                :get-u8
+                :get-u16
+                :get-u32
+                :get-u64
+                :get-s8
+                :get-s16
+                :get-s32
+                :get-s64
+                :put-u8
+                :put-u16
+                :put-u32
+                :put-u64
+                :put-s8
+                :put-s16
+                :put-s32
+                :put-s64)
   (:export :make-binary-input-stream
            :make-binary-output-stream
            :with-binary-input-stream
@@ -47,14 +83,14 @@
            :read-u16
            :read-u32
            :read-u64
-           :write-u8
-           :write-u16
-           :write-u32
-           :write-u64
            :read-s8
            :read-s16
            :read-s32
            :read-s64
+           :write-u8
+           :write-u16
+           :write-u32
+           :write-u64
            :write-s8
            :write-s16
            :write-s32
@@ -63,13 +99,49 @@
            :make-u16vector
            :make-u32vector
            :make-u64vector
+           :make-s8vector
+           :make-s16vector
+           :make-s32vector
+           :make-s64vector
+           :u8vector
+           :u16vector
+           :u32vector
+           :u64vector
+           :s8vector
+           :s16vector
+           :s32vector
+           :s64vector
            :read-u8vector
            :read-u16vector
            :read-u32vector
            :read-u64vector
+           :read-s8vector
+           :read-s16vector
+           :read-s32vector
+           :read-s64vector
            :write-u8vector
            :write-u16vector
            :write-u32vector
            :write-u64vector
-           :uvector-to-string))
+           :write-s8vector
+           :write-s16vector
+           :write-s32vector
+           :write-s64vector
+           :uvector-to-string
+           :get-u8
+           :get-u16
+           :get-u32
+           :get-u64
+           :get-s8
+           :get-s16
+           :get-s32
+           :get-s64
+           :put-u8
+           :put-u16
+           :put-u32
+           :put-u64
+           :put-s8
+           :put-s16
+           :put-s32
+           :put-s64))
 (in-package :cl-binary)
