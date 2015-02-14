@@ -25,10 +25,6 @@
           (progn ,@body)
        (close ,stream))))
 
-(defmacro with-open-binary-input-file ((stream filespec) &body body)
-  `(with-open-file (,stream ,filespec :element-type '(unsigned-byte 8))
-     ,@body))
-
 (defclass binary-output-stream (fundamental-binary-output-stream)
   ((data :initform nil :initarg :data :type (vector (unsigned-byte 8) (*)))))
 
@@ -49,8 +45,8 @@
                  (slot-value ,stream 'data))
        (close ,stream))))
 
-(defmacro with-open-binary-output-file ((stream filespec) &body body)
-  `(with-open-file (,stream ,filespec :direction :output :element-type '(unsigned-byte 8) :if-exists :supersede)
+(defmacro with-open-binary-file ((stream filespec &key (direction :input) (if-exists :supersede)) &body body)
+  `(with-open-file (,stream ,filespec :direction ,direction :if-exists ,if-exists :element-type '(unsigned-byte 8))
      ,@body))
 
 ;;; read-u8
