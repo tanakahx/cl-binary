@@ -8,8 +8,7 @@
                 :make-binary-output-stream
                 :with-binary-input-stream
                 :with-binary-output-stream
-                :with-open-binary-input-file
-                :with-open-binary-output-file
+                :with-open-binary-file
                 :read-u8
                 :read-u16
                 :read-u32
@@ -39,8 +38,7 @@
            :make-binary-output-stream
            :with-binary-input-stream
            :with-binary-output-stream
-           :with-open-binary-input-file
-           :with-open-binary-output-file
+           :with-open-binary-file
            :read-u8
            :read-u16
            :read-u32
