@@ -16,28 +16,34 @@ Add the path to the cloned repository into the ASDF source-registry and load cl-
 ```
 
 ### with-open-binary-file stream filespec
-Open binary file and read binary data.
-```cl
-(with-open-binary-file (in "foo.bin")
-  (format t "~A~%" (read-u8 in))
-  (format t "~A~%" (read-u16 in))
-  (foramt t "~A~%" (read-u32 in))
-  (foramt t "~A~%" (read-u64 in)))
-```
-
+Open file in binary mode and write data to it.
 ```cl
 (with-open-binary-file (out "foo.bin" :direction :output)
   (write-u8  out #x01)
-  (write-u16 out #x23)
-  (write-u32 out #x45)
-  (write-u64 out #x67))
+  (write-u16 out #x0123)
+  (write-u32 out #x01234567)
+  (write-u64 out #x0123456789abcdef))
 ```
+
+Open binary file and read data from it.
+```cl
+(with-open-binary-file (in "foo.bin")
+  (format t "0x~X~%" (read-u8 in))
+  (format t "0x~X~%" (read-u16 in))
+  (format t "0x~X~%" (read-u32 in))
+  (format t "0x~X~%" (read-u64 in)))
+;; 0x1
+;; 0x123
+;; 0x1234567
+;; 0x123456789ABCDEF
+```
+
 
 ### with-open-input-binary-stream stream filespec
 Open binary stream for reading from vector and read binary data from it.
 ```cl
 (with-open-input-binary-stream (in #(#x01 #x23 #x45 #x67))
-  (foramt t "~A~%" (read-u32 in))) ; => #x67452301
+  (format t "~A~%" (read-u32 in))) ; => #x67452301
 ```
 
 ### with-open-output-binary-stream
