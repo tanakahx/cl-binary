@@ -2,6 +2,7 @@
 (defpackage :cl-binary
   (:use :cl
         :trivial-gray-streams
+        :ieee-floats
         :cl-binary.io)
   (:import-from :cl-binary.io
                 :make-binary-input-stream
