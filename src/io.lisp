@@ -50,6 +50,14 @@
   `(with-open-file (,stream ,filespec :direction ,direction :if-exists ,if-exists :element-type '(unsigned-byte 8))
      ,@body))
 
+(defun mkstr (&rest args)
+  (with-output-to-string (s)
+    (dolist (a args)
+      (princ a s))))
+
+(defun symb (&rest args)
+  (values (intern (apply #'mkstr args))))
+
 (defun u-to-s (number bit)
   "Convert an unsigned number to a signed number with `bit` length."
   (if (and (plusp number)
@@ -69,8 +77,8 @@
       (error "Out of bounds error (Number is beyond ~a bit)" bit)))
 
 (defmacro def-signed (name unit place &optional val &key (direction :input))
-  (let ((sname (intern (format nil "~a-S~a" name unit)))
-        (uname (intern (format nil "~a-U~a" name unit))))
+  (let ((sname (symb name "-S" unit))
+        (uname (symb name "-U" unit)))
     (case direction
       (:input
        `(defun ,sname (,@place)
@@ -85,7 +93,7 @@
 ;;; read-u32
 ;;; read-u64
 (defmacro def-read-u* (unit)
-  `(defun ,(intern (format nil "READ-U~a" unit)) (stream)
+  `(defun ,(symb "READ-U" unit) (stream)
      ,(if (<= unit 8)
           `(read-byte stream)
           `(logior
@@ -109,8 +117,8 @@
 ;;; read-f32
 ;;; read-f64
 (defmacro def-read-f* (unit)
-  `(defun ,(intern (format nil "READ-F~a" unit)) (stream)
-     (,(intern (format nil "DECODE-FLOAT~a" unit)) (,(intern (format nil "READ-U~a" unit)) stream))))
+  `(defun ,(symb "READ-F" unit) (stream)
+     (,(symb "DECODE-FLOAT" unit) (,(symb "READ-U" unit)  stream))))
 
 (def-read-f* 32)
 (def-read-f* 64)
@@ -120,7 +128,7 @@
 ;;; write-u32
 ;;; write-u64
 (defmacro def-write-u* (unit)
-  `(defun ,(intern (format nil "WRITE-U~a" unit)) (stream val)
+  `(defun ,(symb "WRITE-U" unit) (stream val)
      ,(if (<= unit 8)
           `(write-byte val stream)
           (cons 'progn
@@ -144,8 +152,8 @@
 ;;; write-f32
 ;;; write-f64
 (defmacro def-write-f* (unit)
-  `(defun ,(intern (format nil "WRITE-F~a" unit)) (stream val)
-     (,(intern (format nil "WRITE-U~a" unit)) stream (,(intern (format nil "ENCODE-FLOAT~a" unit)) val))))
+  `(defun ,(symb "WRITE-F" unit) (stream val)
+     (,(symb "WRITE-U" unit) stream (,(symb "ENCODE-FLOAT" unit) val))))
 
 (def-write-f* 32)
 (def-write-f* 64)
@@ -165,7 +173,7 @@
                 (F (if (= unit 32)
                        ''single-float
                        ''double-float)))))
-    `(defmacro ,(intern (format nil "MAKE-~a~aVECTOR" sign unit)) (len &optional (fill nil supplied-p))
+    `(defmacro ,(symb "MAKE-" sign unit "VECTOR") (len &optional (fill nil supplied-p))
        (if supplied-p
            `(make-array ,len :element-type ,',type :initial-element ,fill)
            `(make-array ,len :element-type ,',type)))))
@@ -190,7 +198,7 @@
 ;;; s32vector
 ;;; s64vector
 ;;; f32vector
-;;; d64vector
+;;; f64vector
 (defmacro uvector (sign unit)
   (let ((type (case sign
                 (U `'(unsigned-byte ,unit))
@@ -198,7 +206,7 @@
                 (F (if (= unit 32)
                        ''single-float
                        ''double-float)))))
-    `(defmacro ,(intern (format nil "~a~aVECTOR" sign unit)) (&rest objects)
+    `(defmacro ,(symb sign unit "VECTOR") (&rest objects)
        `(make-array (length ',objects) :element-type ,',type :initial-contents ',objects))))
 
 (uvector u 8)
@@ -223,11 +231,11 @@
 ;;; read-f32vector
 ;;; read-f64vector
 (defmacro def-read-uvector (sign unit)
-  `(defun ,(intern (format nil "READ-~a~aVECTOR" sign unit)) (len stream)
+  `(defun ,(symb "READ-" sign unit "VECTOR") (len stream)
      (loop
-        with uv = (,(intern (format nil "MAKE-~a~aVECTOR" sign unit)) len)
+        with uv = (,(symb "MAKE-" sign unit "VECTOR") len)
         for i below len
-        do (setf (aref uv i) (,(intern (format nil "READ-~a~a" sign unit)) stream))
+        do (setf (aref uv i) (,(symb "READ-" sign unit) stream))
         finally (return uv))))
 
 (def-read-uvector u 8)
@@ -252,9 +260,9 @@
 ;;; write-f32vector
 ;;; write-f64vector
 (defmacro def-write-uvector (sign unit)
-  `(defun ,(intern (format nil "WRITE-~a~aVECTOR" sign unit)) (stream vec)
+  `(defun ,(symb "WRITE-" sign unit "VECTOR") (stream vec)
      (loop for x across vec
-        do (,(intern (format nil "WRITE-~a~a" sign unit)) stream x))))
+        do (,(symb "WRITE-" sign unit) stream x))))
 
 (def-write-uvector u 8)
 (def-write-uvector u 16)
@@ -279,7 +287,7 @@
 ;;; get-u32
 ;;; get-u64
 (defmacro def-get-u* (unit)
-  `(defun ,(intern (format nil "GET-U~a" unit)) (uv pos)
+  `(defun ,(symb "GET-U" unit) (uv pos)
      ,(if (<= unit 8)
           `(aref uv pos)
           `(logior
@@ -305,7 +313,7 @@
 ;;; get-f32
 ;;; get-f64
 (defmacro def-get-f* (unit)
-  `(defun ,(intern (format nil "GET-F~a" unit)) (uv pos)
+  `(defun ,(symb "GET-F" unit) (uv pos)
      (decode-float32
       (logior
        ,@(loop
@@ -320,7 +328,7 @@
 ;;; put-u32
 ;;; put-u64
 (defmacro def-put-u* (unit)
-  `(defun ,(intern (format nil "PUT-U~a" unit)) (uv pos val)
+  `(defun ,(symb "PUT-U" unit) (uv pos val)
      ,(if (<= unit 8)
           `(setf (aref uv pos) val)
           (cons 'progn
@@ -346,8 +354,8 @@
 ;;; put-f32
 ;;; put-f64
 (defmacro def-put-f* (unit)
-  `(defun ,(intern (format nil "PUT-F~a" unit)) (uv pos val)
-     (let ((encoded-val (,(intern (format nil "ENCODE-FLOAT~a" unit)) val)))
+  `(defun ,(symb "PUT-F" unit) (uv pos val)
+     (let ((encoded-val (,(symb "ENCODE-FLOAT" unit) val)))
        ,@(loop
             for i from 0 above (- unit) by 8
             for p from 0
