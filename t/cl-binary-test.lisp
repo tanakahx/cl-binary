@@ -20,7 +20,20 @@
   (with-binary-input-stream (in #(#x01 #x23 #x45 #x67))
     (is (= (read-u32 in) #x67452301)))
   (with-binary-input-stream (in #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef))
-    (is (= (read-u64 in) #xefcdab8967452301))))
+    (is (= (read-u64 in) #xefcdab8967452301)))
+
+  (with-binary-input-stream (in #(#x01))
+    (is (= (read-u32 in) #x00000001))
+    (is (eq (read-u32 in) nil)))
+  (with-binary-input-stream (in #(#x01 #x23))
+    (is (= (read-u32 in) #x00002301))
+    (is (eq (read-u32 in) nil)))
+  (with-binary-input-stream (in #(#x01 #x23 #x45))
+    (is (= (read-u32 in) #x00452301))
+    (is (eq (read-u32 in) nil)))
+  (with-binary-input-stream (in #(#x01 #x23 #x45 #x67))
+    (is (= (read-u32 in) #x67452301))
+    (is (eq (read-u32 in) nil))))
 
 (test write-u*
   (is (equalp (with-binary-output-stream (out)
