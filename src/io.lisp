@@ -5,6 +5,15 @@
         :ieee-floats))
 (in-package :cl-binary.io)
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun mkstr (&rest args)
+    (with-output-to-string (s)
+      (dolist (a args)
+        (princ a s))))
+
+  (defun symb (&rest args)
+    (values (intern (apply #'mkstr args)))))
+
 (defclass binary-input-stream (fundamental-binary-input-stream)
   ((data :initarg :data :type (vector (unsigned-byte 8) (*)))
    (index :initarg :index)
@@ -50,14 +59,6 @@
   `(with-open-file (,stream ,filespec :direction ,direction :if-exists ,if-exists :element-type '(unsigned-byte 8))
      ,@body))
 
-(defun mkstr (&rest args)
-  (with-output-to-string (s)
-    (dolist (a args)
-      (princ a s))))
-
-(defun symb (&rest args)
-  (values (intern (apply #'mkstr args))))
-
 (defun u-to-s (number bit)
   "Convert an unsigned number to a signed number with `bit` length."
   (if (and (plusp number)
@@ -95,10 +96,14 @@
 (defmacro def-read-u* (unit)
   `(defun ,(symb "READ-U" unit) (stream)
      ,(if (<= unit 8)
-          `(read-byte stream)
-          `(logior
-            ,@(loop for i from 0 below unit by 8
-                 collect `(ash (read-byte stream) ,i))))))
+          `(read-byte stream nil nil)
+          (let ((b (gensym)))
+            `(let ((,b (read-byte stream nil nil)))
+               (when ,b
+                 (logior
+                  ,b
+                  ,@(loop for i from 8 below unit by 8
+                       collect `(ash (read-byte stream nil 0) ,i)))))))))
 
 (def-read-u* 8)
 (def-read-u* 16)
