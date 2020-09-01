@@ -15,7 +15,7 @@
     (values (intern (apply #'mkstr args)))))
 
 (defclass binary-input-stream (fundamental-binary-input-stream)
-  ((data :initarg :data :type (vector (unsigned-byte 8) (*)))
+  ((data :initarg :data :type (vector (unsigned-byte 8) *))
    (index :initarg :index)
    (end :initarg :end)))
 
@@ -36,7 +36,7 @@
        (close ,stream))))
 
 (defclass binary-output-stream (fundamental-binary-output-stream)
-  ((data :initform nil :initarg :data :type (vector (unsigned-byte 8) (*)))))
+  ((data :initform nil :initarg :data :type (vector (unsigned-byte 8) *))))
 
 (defun make-binary-output-stream (&optional data)
   (make-instance 'binary-output-stream :data data))
@@ -77,7 +77,7 @@
           number)
       (error "Out of bounds error (Number is beyond ~a bit)" bit)))
 
-(defmacro def-signed (name unit place &optional val &key (direction :input))
+(defmacro def-signed (name unit place &key direction val)
   (let ((sname (symb name "-S" unit))
         (uname (symb name "-U" unit)))
     (case direction
@@ -114,10 +114,10 @@
 ;;; read-s16
 ;;; read-s32
 ;;; read-s64
-(def-signed read   8 (stream) nil :direction :input)
-(def-signed read  16 (stream) nil :direction :input)
-(def-signed read  32 (stream) nil :direction :input)
-(def-signed read  64 (stream) nil :direction :input)
+(def-signed read   8 (stream) :direction :input)
+(def-signed read  16 (stream) :direction :input)
+(def-signed read  32 (stream) :direction :input)
+(def-signed read  64 (stream) :direction :input)
 
 ;;; read-f32
 ;;; read-f64
@@ -149,10 +149,10 @@
 ;;; write-s16
 ;;; write-s32
 ;;; write-s64
-(def-signed write  8 (stream) val :direction :output)
-(def-signed write 16 (stream) val :direction :output)
-(def-signed write 32 (stream) val :direction :output)
-(def-signed write 64 (stream) val :direction :output)
+(def-signed write  8 (stream) :direction :output :val val)
+(def-signed write 16 (stream) :direction :output :val val)
+(def-signed write 32 (stream) :direction :output :val val)
+(def-signed write 64 (stream) :direction :output :val val)
 
 ;;; write-f32
 ;;; write-f64
@@ -310,10 +310,10 @@
 ;;; get-s16
 ;;; get-s32
 ;;; get-s64
-(def-signed get  8 (uv pos) nil :direction :input)
-(def-signed get 16 (uv pos) nil :direction :input)
-(def-signed get 32 (uv pos) nil :direction :input)
-(def-signed get 64 (uv pos) nil :direction :input)
+(def-signed get  8 (uv pos) :direction :input)
+(def-signed get 16 (uv pos) :direction :input)
+(def-signed get 32 (uv pos) :direction :input)
+(def-signed get 64 (uv pos) :direction :input)
 
 ;;; get-f32
 ;;; get-f64
@@ -351,10 +351,10 @@
 ;;; put-s16
 ;;; put-s32
 ;;; put-s64
-(def-signed put  8 (uv pos) val :direction :output)
-(def-signed put 16 (uv pos) val :direction :output)
-(def-signed put 32 (uv pos) val :direction :output)
-(def-signed put 64 (uv pos) val :direction :output)
+(def-signed put  8 (uv pos) :direction :output :val val)
+(def-signed put 16 (uv pos) :direction :output :val val)
+(def-signed put 32 (uv pos) :direction :output :val val)
+(def-signed put 64 (uv pos) :direction :output :val val)
 
 ;;; put-f32
 ;;; put-f64
