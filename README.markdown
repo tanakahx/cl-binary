@@ -55,7 +55,7 @@ Open binary file and read data from it.
 ;; 0x123456789ABCDEF
 ```
 
-### with-binary-output-stream stream
+### with-binary-output-stream stream &optional vector
 Open an output stream and write to it as binary data.
 ```cl
 (cl-binary:with-binary-output-stream (out)
@@ -66,7 +66,7 @@ Open an output stream and write to it as binary data.
     (cl-binary:write-u32 out #xefcdab89))) ; => #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef)
 ```
 
-### with-binary-input-stream stream filespec
+### with-binary-input-stream stream vector
 Open an input stream and read from it as binary data.
 ```cl
 (cl-binary:with-binary-input-stream (in #(#x01 #x23 #x45 #x67 #x89 #xab #xcd #xef))
