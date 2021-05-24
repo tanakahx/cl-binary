@@ -36,7 +36,9 @@
        (close ,stream))))
 
 (defclass binary-output-stream (fundamental-binary-output-stream)
-  ((data :initform nil :initarg :data :type (vector (unsigned-byte 8) *))))
+  ((data :initform (make-array 0 :element-type '(unsigned-byte 8) :fill-pointer 0 :adjustable t)
+         :initarg :data
+         :type (vector (unsigned-byte 8) *))))
 
 (defun make-binary-output-stream (&optional data)
   (make-instance 'binary-output-stream :data data))
